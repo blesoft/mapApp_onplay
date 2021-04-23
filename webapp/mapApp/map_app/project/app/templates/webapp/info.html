@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <title>マップマーカーデータリスト</title>
+    </head>
+    <body>
+        <h1>{{ title }}</h1>
+        <table border="1">
+            <tr>
+                {% for h in header %}
+                    <th>{{h}}</th>
+                {% endfor %}
+            </tr>
+
+            {% for i in val %}
+            <tr>
+                <td>{{i.name}}</td>
+                <td>{{i.genre}}</td>
+                <td>{{i.location}}</td>
+                <td>{{i.created_at}}</td>
+                <td><a href="{% url 'webapp:update' i.id %}">編集</a></td>
+                <td><a href="{% url 'webapp:delete' i.id %}">削除</a></td>
+                <td><img src="{{ i.photo.url }}"width="100" height="100"/></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

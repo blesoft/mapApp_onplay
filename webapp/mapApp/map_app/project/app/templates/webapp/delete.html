@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <body>
+        <h1>{{title}}</h1>
+        <table>
+            <tr><th>ID</th><td>{{ obj.id }}</td></tr>
+            <tr><th>店名</th><td>{{ obj.name }}</td></tr>
+            <tr><th>ジャンル</th><td>{{ obj.gnere }}</td></tr>
+            <tr><th>所在地</th><td>{{ obj.location }}</td></tr>
+            <tr><th>作成日</th><td>{{ obj.created_at }}</td></tr>
+            <form action="{% url 'webapp:delete' id %}" method="post">
+            {% csrf_token %}
+            <tr><td></td><td><input type="submit" value="削除"></td></tr>
+            </form>
+      </table>
+    </body>
+</html>

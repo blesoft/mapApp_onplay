@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="uft-8">
+        <title>グルメマップ</title>
+    </head>
+    <body>
+        <h1>グルメマップ</h1>
+        <!-- ボタン追加 -->
+        <input type="button" value="登録リスト一覧" id="btn"></button>
+        <div id='map' style="width: 700px;height: 500px;"></div>
+
+        <table hidden id="dataTable">
+            {% for i in val %}
+            <tr>
+                <td>{{i.name}}</td>
+                <td>{{i.genre}}</td>
+                <td>{{i.location}}</td>
+                <td>{{i.created_at}}</td>
+                <td>{{i.lat}}</td>
+                <td>{{i.lng}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <script>
+            let button = document.getElementById("btn"); // ボタン
+            //////// テーブル情報取得 ////////
+            let table = document.getElementById('dataTable');
+            let rows  = table.querySelectorAll('tr');
+            let cells = table.querySelectorAll('td');
+            var obj_num = rows.length; // object 数取得
+            var elm_num = cells.length/obj_num; // 要素数取得
+            // alert('list_num:'+obj_num);
+            // alert('elm_num:'+elm_num);
+            // データ格納リスト
+            var markerlist = [];
+            for (let row of table.rows) {
+                for (let cell of row.cells) {
+                    // markerlist[i][j] = cell.innerText;
+                    // alert('markerlist['+i+']['+j+']:'+markerlist[i][j]);
+                    markerlist.push(cell.innerText);
+                }
+            }
+
+            /////// map 準備 ////////
+            if (navigator.geolocation){
+                // Geolocation API に対応しているかのチェック
+            } else {
+                alert("この端末では位置情報が取得できません")
+            }
+            function getPosition() {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        initMap(position.coords.latitude,position.coords.longitude);
+                    }
+                );
+            }
+            // デフォルト map 表示
+            function initMap(lat,lng) {
+                // Google Map を表示する
+                center = {lat:lat,lng:lng}
+                var map = new google.maps.Map(document.getElementById('map'),{
+                    zoom: 16, center: center,
+                });
+                var latLng = new google.maps.LatLng(lat,lng);
+                // 登録済みのデータをマーカー表示する
+                subMarker(map,markerlist);
+                // 表示する箇所を現在地中心に戻す
+                map.setCenter(latLng);
+                // 現在地のマーカーを表示する
+                makeMarker(map,center);
+                button.addEventListener('click',function(event){
+                    // positionSet(map,latLng);
+                    window.location.href = "info";
+                });
+                // クリックした箇所の position を獲得
+                google.maps.event.addListener(map,'click',function(event){
+                    alert('lat'+event.latLng.lat());
+                    alert('lng'+event.latLng.lng());
+                });
+            }
+
+            ////// mainmarker ///////
+            // make mainmarker()
+            function makeMarker(map,center) {
+                marker = new google.maps.Marker({
+                    position: center, map:map,
+                    icon: {
+                        url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                        scaledSize : new google.maps.Size(50,50)
+                    }
+                });
+                self.infoWindow_main(map,marker);
+            }
+            // main_marker window()
+            function infoWindow_main(map,marker) {
+                var infoWindow = new google.maps.InfoWindow({
+                    content: '<strong>現在地</strong>だよ！'
+                });
+                var btn_page = document.createElement("button");
+                btn_page.innerText = "現在地をマーカーリストに追加";
+                google.maps.event.addDomListener(btn_page,'click',function(){
+                    alert("クリック呼び出し");
+                    // alert(typeof marker.position);
+                    // alert(marker.position.lat());
+                    var lat = marker.position.lat();
+                    var lng = marker.position.lng();
+                    var lat_int = parseInt(lat); // lat 整数部分
+                    var lng_int = parseInt(lng); // lng 整数部分
+                    var lat_flo = parseInt((lat - lat_int) * 1000); // lat 少数部分
+                    var lng_flo = parseInt((lng - lng_int) * 1000); // lng 少数部分
+                    window.location.href = "create/" + lat_int +'/'+ lat_flo +'/'+ lng_int +'/'+ lng_flo;
+                });
+                infoWindow.setContent(btn_page);
+                infoWindow.open(map,marker);
+            }
+
+            //////// submarker ////////
+            // make submarker()
+            function subMarker(map,markerlist) {
+                // marker つくるよ～～～
+                // 緯度経度取得
+                // let lat = parseFloat(markerlist[0][4]); // lat 取得
+                // let lng = parseFloat(markerlist[0][5]); // lng 取得
+                var lat_list = getCol(markerlist,4); // lat
+                var lng_list = getCol(markerlist,5); // lng
+                for (var i=0;i<obj_num;i++){
+                    var lat = parseFloat(lat_list[i]);
+                    var lng = parseFloat(lng_list[i]);
+                    var latlng = new google.maps.LatLng(lat,lng);
+                    var submarker = new google.maps.Marker({
+                        position: latlng,
+                        map:map,
+                    });
+                    var obj_data = getObj(markerlist,i);
+                    // alert('i:' + i + obj_data[0]);
+                    self.infoWindow_sub(map,submarker,obj_data);
+                }
+            }
+            // sub_marker window()
+            function infoWindow_sub(map,marker,list) {
+                var infoWindow = new google.maps.InfoWindow({
+                    content: list[0]
+                });
+                infoWindow.open(map,marker);
+            }
+
+            // 各要素を獲得
+            function getCol(array,col) {
+                var colum = [];
+                for (var i=0;i<array.length;i++) {
+                    if (i%elm_num==col) {
+                        colum.push(array[i]);
+                    }
+                }
+                return colum;
+            }
+            // object の各データを獲得
+            function getObj(array,obj) {
+                var colum = [];
+                for (var i=0;i<elm_num;i++) {
+                    colum.push(array[obj*elm_num+i]);
+                }
+                return colum;
+            }
+        </script>
+        <script async defer
+            src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDiRGiLEoTJaBSR1O3NVCcOVszlt8Zo7cs&callback=getPosition">
+        </script>
+    </body>
+</html>
