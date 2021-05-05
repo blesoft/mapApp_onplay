@@ -4,12 +4,19 @@
 4/30説明内容  
 機械学習 ⊃ ディープラーニング  
 
+![kikaigakushuu](https://user-images.githubusercontent.com/48379176/117101642-a4c32080-adb1-11eb-9e95-333daa8a28d9.jpg)
+
 上記隠し層が,複雑化かつ多層化ざれたものを一般的にディープラーニングと呼ぶ.  
 上記の隠し層には様々な処理を行う層をいくつも組み合わせており,その中で,画像解析の分野で多く用いられるのがCNNモデルと呼ばれる層の組み合わせパターンだ. 
 
 CNNモデル：隠し層 ⊃ 畳み込み層,プーリング層,結合層  
 
+![tatamikomi](https://user-images.githubusercontent.com/48379176/117101687-bc9aa480-adb1-11eb-9247-83a9ab6e67a7.jpg)
+![puringu](https://user-images.githubusercontent.com/48379176/117101716-ccb28400-adb1-11eb-8825-58d16eb22502.jpg)
+
 以下がCNNモデルの基本設計図となる.
+
+![CNN](https://user-images.githubusercontent.com/48379176/117101749-ddfb9080-adb1-11eb-8997-96abae36db7c.jpg)
 
 ここで,結合層から出力層に送られるデータは多次元データとなっており,これがモデルがサンプルから学習した特徴をパラメータとして表したものとなる.  
 この各パラメータに,重要度によって重みづけをすることにより,検証時の精度が上下する.  
